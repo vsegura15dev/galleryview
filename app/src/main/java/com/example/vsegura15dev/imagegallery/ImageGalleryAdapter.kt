@@ -6,9 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 
-class ImageGalleryAdapter(var itemsId: MutableList<Int> = mutableListOf()) :
+class ImageGalleryAdapter(
+    private var itemsId: MutableList<Int> = mutableListOf(),
+    private var listener: GalleryItemClickListener
+) :
     RecyclerView.Adapter<ImageGalleryAdapter.ImageItemViewHolder>() {
 
+    interface GalleryItemClickListener {
+        fun onLongClick(position: Int)
+
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): ImageItemViewHolder {
 
@@ -20,6 +27,17 @@ class ImageGalleryAdapter(var itemsId: MutableList<Int> = mutableListOf()) :
 
     override fun onBindViewHolder(viewHolder: ImageItemViewHolder, position: Int) {
         viewHolder.imageView.setImageResource(itemsId[position])
+        (viewHolder.imageView.parent as View).setOnLongClickListener {
+            listener.onLongClick(position)
+            it.isSelected = true
+            true
+        }
+    }
+
+
+    fun removeItem(position: Int) {
+        this.itemsId.removeAt(position)
+        notifyItemRemoved(position)
     }
 
     class ImageItemViewHolder : RecyclerView.ViewHolder {
